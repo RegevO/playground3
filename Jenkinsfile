@@ -36,5 +36,18 @@ pipeline {
                 sh "docker push ${DOCKER_HUB_USER}/${IMAGE_NAME}:${TAG}"
             }
         }
+        stage('Run Container') {
+            steps {
+                script {
+                    // 1. Stop and remove any existing container with the same name to avoid conflicts
+                    sh "docker rm -f ${IMAGE_NAME}-container || true"
+                    
+                    // 2. Run the new container
+                    // -d: detached mode
+                    // -p: mapping host port 8090 to container port 80 (change 80 to your app's port)
+                    sh "docker run -d --name ${IMAGE_NAME}-container -p 8090:80 ${DOCKER_HUB_USER}/${IMAGE_NAME}:${TAG}"
+                }
+            }
+        }
     }
 }
