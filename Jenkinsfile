@@ -44,8 +44,8 @@ pipeline {
                     
                     // 2. Run the new container
                     // -d: detached mode
-                    // -p: mapping host port 8090 to container port 80 (change 80 to your app's port)
-                    sh "docker run -d --name ${IMAGE_NAME}-container -p 8090:80 ${DOCKER_HUB_USER}/${IMAGE_NAME}:${TAG}"
+                    // -p: mapping host port 8090 to container port 5000 (change 5000 to your app's port)
+                    sh "docker run -d --name ${IMAGE_NAME}-container -p 8090:5000 ${DOCKER_HUB_USER}/${IMAGE_NAME}:${TAG}"
                 }
             }
         }
