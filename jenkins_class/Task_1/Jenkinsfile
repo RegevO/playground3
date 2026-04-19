@@ -1,0 +1,41 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Setup: Create Dockerfile') {
+            steps {
+                // Creates a simple Dockerfile in the workspace
+                writeFile file: 'Dockerfile', text: '''
+FROM python:3.9-slim
+RUN pip install flask==2.0.1
+'''
+            }
+        }
+
+        stage('Build: Docker Image') {
+            steps {
+                script {
+                    // Builds the image locally
+                    sh 'docker build -t my-python-app .'
+                }
+            }
+        }
+
+        stage('Scan: Trivy Analysis') {
+            steps {
+                script {
+                    // Scans the image and outputs to the console
+                    // --severity HIGH,CRITICAL filters for the most important issues
+                    sh 'trivy image --severity HIGH,CRITICAL my-python-app'
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            // Clean up the image to save disk space on your PC
+            sh 'docker rmi my-python-app || true'
+        }
+    }
+}
