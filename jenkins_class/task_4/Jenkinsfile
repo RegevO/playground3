@@ -1,0 +1,22 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Scan: Generate JSON Report') {
+            steps {
+                script {
+                    // 1. Run the scan and output to a JSON file
+                    // We use 'my-python-app' which we built in Task 1
+                    sh 'trivy image --format json -o trivy-report.json my-python-app'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // 2. This makes the JSON file available in the Jenkins Build UI
+            archiveArtifacts artifacts: 'trivy-report.json', fingerprint: true
+        }
+    }
+}
