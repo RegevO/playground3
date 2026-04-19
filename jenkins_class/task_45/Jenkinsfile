@@ -1,0 +1,33 @@
+pipeline {
+    agent any
+    environment {
+        TRIVY_CACHE_DIR = '/tmp/trivy-cache'
+    }
+    stages {
+        stage('Scan Public Image') {
+            steps {
+                sh '''
+                    if [ ! -f $TRIVY_CACHE_DIR/db/trivy.db ]; then
+                        echo "First run – downloading Trivy DB..."
+                        trivy image --cache-dir $TRIVY_CACHE_DIR --download-db-only
+                    fi
+
+                    trivy image \
+                      --cache-dir $TRIVY_CACHE_DIR \
+                      --skip-db-update \
+                      --scanners vuln \
+                      --severity HIGH,CRITICAL \
+                      --exit-code 0 \
+                      --no-progress \
+                      --timeout 5m \
+                      nginx:latest
+                '''
+            }
+        }
+    }
+    post {
+        always {
+            echo 'Scan complete - build marked SUCCESS regardless of findings'
+        }
+    }
+}
