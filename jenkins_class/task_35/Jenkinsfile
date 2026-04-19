@@ -1,0 +1,11 @@
+@Library('myPlayground3Library') _
+pipeline {
+    agent any
+    stages {
+        stage('Use Advanced Function') {
+            steps {
+                printMessage('Hello from Advanced Shared Library!)', 
+            }
+        }
+    }
+}
