@@ -1,0 +1,62 @@
+pipeline {
+    agent any
+
+    environment {
+        // Change 'regev' to your actual Docker Hub username
+        DOCKER_USER_NAME = 'regev'
+        IMAGE_NAME       = "regev/hello-flask"
+    }
+
+    stages {
+        stage('Code Checkout') {
+            steps {
+                // Pulls your code from GitHub
+                git url: 'https://github.com/RegevO/playground3.git',
+                    branch: 'main'
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                // Builds the image locally on your Windows machine (via the socket)
+                sh 'docker build -t ${IMAGE_NAME}:latest .'
+            }
+        }
+
+        stage('Trivy Scan') {
+            steps {
+                script {
+                    echo "--- SECURITY SCANNING: ${IMAGE_NAME} ---"
+                    // Scans for vulnerabilities. --exit-code 0 ensures the pipeline continues.
+                    sh 'trivy image --exit-code 0 --severity LOW,MEDIUM,HIGH,CRITICAL ${IMAGE_NAME}:latest'
+                }
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                // Uses the specific Credential ID from your URL: Doker_hub_PAT
+                withCredentials([usernamePassword(
+                    credentialsId: 'Doker_hub_PAT', 
+                    usernameVariable: 'DOCKER_HUB_USER',
+                    passwordVariable: 'DOCKER_HUB_PAT'
+                )]) {
+                    script {
+                        // Login to Docker Hub using the credentials provided by Jenkins
+                        sh 'echo "${DOCKER_HUB_PAT}" | docker login -u "${DOCKER_HUB_USER}" --password-stdin'
+                        
+                        // Push the image to your repository
+                        sh 'docker push ${IMAGE_NAME}:latest'
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Clean up the local Docker login to keep your machine secure
+            sh 'docker logout || true'
+        }
+    }
+}
