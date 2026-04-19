@@ -1,0 +1,24 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Scan: Nginx (Large)') {
+            steps {
+                script {
+                    echo "--- SCANNING NGINX:LATEST ---"
+                    // We use '|| true' so the pipeline doesn't stop if it finds vulnerabilities
+                    sh 'trivy image --severity HIGH,CRITICAL nginx:latest || true'
+                }
+            }
+        }
+
+        stage('Scan: Alpine (Minimal)') {
+            steps {
+                script {
+                    echo "--- SCANNING ALPINE:3.14 ---"
+                    sh 'trivy image --severity HIGH,CRITICAL alpine:3.14 || true'
+                }
+            }
+        }
+    }
+}
