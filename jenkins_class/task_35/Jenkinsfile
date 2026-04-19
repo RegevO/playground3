@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Use Advanced Function') {
             steps {
-                printMessage('Hello from Advanced Shared Library!'), 
+                printMessage('Hello from Advanced Shared Library!')
             }
         }
     }
