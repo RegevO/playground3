@@ -4,7 +4,7 @@ pipeline {
     environment {
         // Change 'regev' to your actual Docker Hub username
         DOCKER_USER_NAME = 'regev987'
-        IMAGE_NAME       = "regev/hello-flask"
+        IMAGE_NAME       = "regev987/hello-flask"
     }
 
     stages {
