@@ -1,10 +1,10 @@
-@Library('myPlayground3Library') _
+@Library('myPlaygrouLibrary') _
 pipeline {
     agent any
     stages {
         stage('Use Advanced Function') {
             steps {
-                printMessage('Hello from Advanced Shared Library!)', 
+                printMessage('Hello from Advanced Shared Library!'), 
             }
         }
     }
